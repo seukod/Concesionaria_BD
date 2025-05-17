@@ -71,6 +71,7 @@ def main():
         print(f"{anomes}: Ventas={monto_ventas}, Compras={monto_compras}, Diferencia={diferencia}")
 
     conn.close()
+    
 
 if __name__ == "__main__":
     main()

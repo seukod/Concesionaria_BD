@@ -8,6 +8,7 @@ import textwrap
 from matplotlib.ticker import FuncFormatter
 import calendar
 from datetime import datetime
+import matplotlib.ticker as mtick
 
 def conectar():
     return psycopg2.connect(
@@ -107,10 +108,19 @@ def compras_ventas_diferencia(conn, anio):
         datos = cursor.fetchall()
     
     # Procesar los datos
-    meses = [fila[0] for fila in datos]
+    meses_raw = [fila[0] for fila in datos]
     ventas = [fila[1] for fila in datos]
     compras = [fila[2] for fila in datos]
     diferencias = [fila[3] for fila in datos]
+
+    # Formatear los nombres de los meses
+    meses = []
+    for m in meses_raw:
+        try:
+            dt = datetime.strptime(m, "%Y-%m")
+            meses.append(f"{calendar.month_name[dt.month]} {dt.year}")
+        except:
+            meses.append(m)
 
     # ---------- GRÁFICO DE BARRAS AGRUPADAS ----------
     x = np.arange(len(meses))
@@ -123,12 +133,22 @@ def compras_ventas_diferencia(conn, anio):
 
     plt.title(f'Comparación mensual de Compras, Ventas y Diferencia - {anio}')
     plt.xlabel('Mes')
-    plt.ylabel('Monto en CLP')
+    plt.ylabel('Monto (CLP)')
     plt.xticks(x, meses, rotation=45)
     plt.legend()
     plt.grid(axis='y')
+
+    # Formatear el eje Y como CLP con separador de miles
+    formatter = mtick.FuncFormatter(lambda x, _: f"{int(x):,} CLP".replace(",", "."))
+    plt.gca().yaxis.set_major_formatter(formatter)
+
     plt.tight_layout()
-    plt.savefig(f'comparacion_barras_{anio}.png')
+
+    # Crear carpeta si no existe
+    output_dir = "graficos"
+    os.makedirs(output_dir, exist_ok=True)
+    filename = f"{output_dir}/comparacion_barras_{anio}.png"
+    plt.savefig(filename)
     plt.show()
 
     return datos
@@ -355,35 +375,35 @@ def main():
     
     conn = conectar()
     #LISTO
-    """print(f"\nVentas por mes para el año {args.anio}:")
+    print(f"\nVentas por mes para el año {args.anio}:")
     ventas = ventas_por_mes(conn, args.anio)
     for anomes, count in ventas:
-        print(f"{anomes}: {count}")"""
-    #Pendiente
+        print(f"{anomes}: {count}")
+    #LISTO
     print(f"\nCompras, ventas y diferencia para el año {args.anio}:")
     datos = compras_ventas_diferencia(conn, args.anio)
     for anomes, monto_ventas, monto_compras, diferencia in datos:
         print(f"{anomes}: Ventas={monto_ventas}, Compras={monto_compras}, Diferencia={diferencia}")
     #LISTO
-    """print(f"\nTop 10 modelos más vendidos en {args.anio}:")
+    print(f"\nTop 10 modelos más vendidos en {args.anio}:")
     top_modelos = top_10_modelos_mas_vendidos(conn, args.anio)
     for nombre_modelo, cantidad in top_modelos:
-        print(f"{nombre_modelo}: {cantidad} ventas")"""
+        print(f"{nombre_modelo}: {cantidad} ventas")
     #LISTO
-    """print(f"\nModelo más vendido por región en {args.anio}:")
+    print(f"\nModelo más vendido por región en {args.anio}:")
     modelos_region = modelo_mas_vendido_por_region(conn, args.anio)
     for id_region, modelo, cantidad in modelos_region:
-        print(f"Región {id_region}: {modelo} ({cantidad} ventas)")"""
+        print(f"Región {id_region}: {modelo} ({cantidad} ventas)")
     #LISTO
-    """print(f"\nComparación de autos comprados vs vendidos por región en {args.anio}:")
+    print(f"\nComparación de autos comprados vs vendidos por región en {args.anio}:")
     comparacion = comparacion_compras_vs_ventas_por_region(conn, args.anio)
     for id_region, vendidos, comprados in comparacion:
-        print(f"Región {id_region}: Vendidos={vendidos}, Comprados={comprados}")"""
+        print(f"Región {id_region}: Vendidos={vendidos}, Comprados={comprados}")
     #LISTO
-    """print(f"\nPromedio de precio de venta por marca en {args.anio}:")
+    print(f"\nPromedio de precio de venta por marca en {args.anio}:")
     precios = promedio_precio_venta_por_marca(conn, args.anio)
     for marca, promedio in precios:
-        print(f"{marca}: ${promedio:.2f}")"""
+        print(f"{marca}: ${promedio:.2f}")
 
     conn.close()
 

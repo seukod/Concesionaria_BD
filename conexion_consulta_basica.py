@@ -1,5 +1,9 @@
 import psycopg2
 import argparse
+import matplotlib.pyplot as plt
+import seaborn as sns
+import os
+import numpy as np
 
 def conectar():
     return psycopg2.connect(
@@ -21,7 +25,41 @@ def ventas_por_mes(conn, anio):
     """
     with conn.cursor() as cursor:
         cursor.execute(query, (anio,))
-        return cursor.fetchall()
+        resultados = cursor.fetchall()
+
+    # Mostrar en consola
+   
+    for anomes, count in resultados:
+        print(f"{anomes}: {count}")
+
+    # Si hay resultados, generar gráfico
+    if resultados:
+        anomes = [r[0] for r in resultados]
+        cantidad = [r[1] for r in resultados]
+
+        plt.figure(figsize=(10, 5))
+        sns.barplot(x=anomes, y=cantidad, palette="Blues_d")
+        plt.title(f'Ventas por mes - {anio}')
+        plt.xticks(rotation=45)
+        plt.ylabel('Cantidad de ventas')
+        plt.xlabel('Mes')
+        plt.tight_layout()
+
+        # Crear carpeta si no existe
+        output_dir = "graficos"
+        os.makedirs(output_dir, exist_ok=True)
+        filename = f"{output_dir}/ventas_por_mes_{anio}.png"
+
+        plt.savefig(filename)
+        plt.show()
+        plt.close()
+        print(f"\n Gráfico guardado como: {filename}")
+        print("Guardando gráfico en:", os.path.abspath(output_dir))
+
+    else:
+        print("\n No se encontraron resultados para ese año.")
+
+    return resultados
 
 def compras_ventas_diferencia(conn, anio):
     query = """
@@ -49,11 +87,39 @@ def compras_ventas_diferencia(conn, anio):
     ) AS ventasmes
     ON comprames.compraanomes = ventasmes.VentaAnomes;
     """
+    
     with conn.cursor() as cursor:
         cursor.execute(query, (anio, anio))
-        return cursor.fetchall()
+        datos = cursor.fetchall()
     
-def top_5_modelos_mas_vendidos(conn, anio):
+    # Procesar los datos
+    meses = [fila[0] for fila in datos]
+    ventas = [fila[1] for fila in datos]
+    compras = [fila[2] for fila in datos]
+    diferencias = [fila[3] for fila in datos]
+
+    # ---------- GRÁFICO DE BARRAS AGRUPADAS ----------
+    x = np.arange(len(meses))
+    ancho = 0.25
+
+    plt.figure(figsize=(14, 6))
+    plt.bar(x - ancho, ventas, width=ancho, label='Ventas', color='green')
+    plt.bar(x, compras, width=ancho, label='Compras', color='blue')
+    plt.bar(x + ancho, diferencias, width=ancho, label='Diferencia', color='red')
+
+    plt.title(f'Comparación mensual de Compras, Ventas y Diferencia - {anio}')
+    plt.xlabel('Mes')
+    plt.ylabel('Monto en CLP')
+    plt.xticks(x, meses, rotation=45)
+    plt.legend()
+    plt.grid(axis='y')
+    plt.tight_layout()
+    plt.savefig(f'comparacion_barras_{anio}.png')
+    plt.show()
+
+    return datos
+    
+def top_10_modelos_mas_vendidos(conn, anio):
     query = """
     SELECT m.nombre_modelo,
            COUNT(*) AS cantidad_vendida
@@ -62,7 +128,7 @@ def top_5_modelos_mas_vendidos(conn, anio):
     WHERE TO_CHAR(hv.fecha_venta, 'YYYY') = %s
     GROUP BY m.nombre_modelo
     ORDER BY cantidad_vendida DESC
-    LIMIT 5;
+    LIMIT 10;
     """
     with conn.cursor() as cursor:
         cursor.execute(query, (anio,))
@@ -133,21 +199,21 @@ def main():
     parser = argparse.ArgumentParser(description="Consulta base de datos por año")
     parser.add_argument("anio", help="Año para filtrar datos, formato YYYY")
     args = parser.parse_args()
-
+    
     conn = conectar()
 
-    print(f"\nVentas por mes para el año {args.anio}:")
+    """print(f"\nVentas por mes para el año {args.anio}:")
     ventas = ventas_por_mes(conn, args.anio)
     for anomes, count in ventas:
-        print(f"{anomes}: {count}")
+        print(f"{anomes}: {count}")"""
 
-    print(f"\nCompras, ventas y diferencia para el año {args.anio}:")
+    """print(f"\nCompras, ventas y diferencia para el año {args.anio}:")
     datos = compras_ventas_diferencia(conn, args.anio)
     for anomes, monto_ventas, monto_compras, diferencia in datos:
-        print(f"{anomes}: Ventas={monto_ventas}, Compras={monto_compras}, Diferencia={diferencia}")
+        print(f"{anomes}: Ventas={monto_ventas}, Compras={monto_compras}, Diferencia={diferencia}")"""
 
-    print(f"\nTop 5 modelos más vendidos en {args.anio}:")
-    top_modelos = top_5_modelos_mas_vendidos(conn, args.anio)
+    print(f"\nTop 10 modelos más vendidos en {args.anio}:")
+    top_modelos = top_10_modelos_mas_vendidos(conn, args.anio)
     for nombre_modelo, cantidad in top_modelos:
         print(f"{nombre_modelo}: {cantidad} ventas")
 

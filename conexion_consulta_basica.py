@@ -6,6 +6,8 @@ import os
 import numpy as np
 import textwrap
 from matplotlib.ticker import FuncFormatter
+import calendar
+from datetime import datetime
 
 def conectar():
     return psycopg2.connect(
@@ -30,17 +32,27 @@ def ventas_por_mes(conn, anio):
         resultados = cursor.fetchall()
 
     # Mostrar en consola
-   
     for anomes, count in resultados:
         print(f"{anomes}: {count}")
 
     # Si hay resultados, generar gráfico
     if resultados:
-        anomes = [r[0] for r in resultados]
+        anomes_raw = [r[0] for r in resultados]
         cantidad = [r[1] for r in resultados]
+
+        # Convertir "YYYY-MM" a "Mes Año"
+        anomes = []
+        for fecha in anomes_raw:
+            try:
+                dt = datetime.strptime(fecha, "%Y-%m")
+                nombre_mes = calendar.month_name[dt.month].capitalize()
+                anomes.append(f"{nombre_mes} {dt.year}")
+            except:
+                anomes.append(fecha)  # fallback si algo falla
 
         plt.figure(figsize=(10, 5))
         sns.barplot(x=anomes, y=cantidad, palette="Blues_d")
+
         plt.title(f'Ventas por mes - {anio}')
         plt.xticks(rotation=45)
         plt.ylabel('Cantidad de ventas')
@@ -55,9 +67,9 @@ def ventas_por_mes(conn, anio):
         plt.savefig(filename)
         plt.show()
         plt.close()
+
         print(f"\n Gráfico guardado como: {filename}")
         print("Guardando gráfico en:", os.path.abspath(output_dir))
-
     else:
         print("\n No se encontraron resultados para ese año.")
 
@@ -342,12 +354,12 @@ def main():
     args = parser.parse_args()
     
     conn = conectar()
-
+    #LISTO
     """print(f"\nVentas por mes para el año {args.anio}:")
     ventas = ventas_por_mes(conn, args.anio)
     for anomes, count in ventas:
         print(f"{anomes}: {count}")"""
-
+    #Pendiente
     print(f"\nCompras, ventas y diferencia para el año {args.anio}:")
     datos = compras_ventas_diferencia(conn, args.anio)
     for anomes, monto_ventas, monto_compras, diferencia in datos:

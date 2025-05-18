@@ -186,7 +186,16 @@ def top_10_modelos_mas_vendidos(conn, anio):
                  str(int(ancho)), va='center')
 
     plt.tight_layout()
+    # Crear carpeta si no existe
+    output_dir = "graficos"
+    os.makedirs(output_dir, exist_ok=True)
+    filename = f"{output_dir}/top_10_modelos_mas_vendidos_{anio}.png"
+    plt.savefig(filename)
     plt.show()
+    plt.close()
+    
+    print(f"\nGráfico guardado como: {filename}")
+    print("Guardando gráfico en:", os.path.abspath(output_dir))
 
     return resultados
 
@@ -240,7 +249,16 @@ def modelo_mas_vendido_por_region(conn, anio):
                  wrap=True)
 
     plt.tight_layout()
+    # Crear carpeta si no existe
+    output_dir = "graficos"
+    os.makedirs(output_dir, exist_ok=True)
+    filename = f"{output_dir}/modelo_mas_vendido_por_region_{anio}.png"
+    plt.savefig(filename)
     plt.show()
+    plt.close()
+    
+    print(f"\nGráfico guardado como: {filename}")
+    print("Guardando gráfico en:", os.path.abspath(output_dir))
 
     return resultados
 

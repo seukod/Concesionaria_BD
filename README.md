@@ -1,3 +1,28 @@
+# Cómo usar el script
+
+## 1. Activar entorno virtual (si corresponde)
+
+Activa tu entorno virtual de Python antes de ejecutar el script.
+
+## 2. Instalar dependencias
+
+```bash
+pip install psycopg2-binary matplotlib seaborn numpy
+```
+
+## 3. Ejecutar el script
+
+Usa el siguiente comando para iniciar el programa, reemplazando `año` por el valor que quieras consultar:
+
+```bash
+python consultas.py año
+```
+
+> 💬 **Comentario:** La base de datos está alojada de forma online en Supabase.
+
+
+
+
 # Concesionaria_BD
 Sistema Concesionaria 
 

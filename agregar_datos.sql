@@ -14,8 +14,7 @@ INSERT INTO region (id_region, nombre_region) VALUES
   (12, 'Región de Magallanes y de la Antártica Chilena'),
   (13, 'Región Metropolitana de Santiago'),
   (14, 'Región de Los Ríos'),
-  (15, 'Región de Arica y Parinacota'),
-  (16, 'Región de Ñuble');
+  (15, 'Región de Arica y Parinacota'),s
 --rellenar tablas ciudades con las 3 ciudades mas grandes de cada ciudad
 INSERT INTO ciudades (id_ciudades, nombre_ciudades) VALUES
 	(1, 'Arica'),(2, 'Putre'),(3, 'Camarones'),
@@ -210,7 +209,7 @@ DECLARE
 BEGIN
     FOR i IN 1..1000 LOOP
         -- Elegir un auto al azar con su modelo
-        SELECT * INTO auto_record FROM autos ORDER BY random() LIMIT 1;
+        SELECT patente, id_modelo INTO auto_record FROM autos ORDER BY random() LIMIT 1;
         modelo_id := auto_record.id_modelo;
         
         -- Elegir ciudad al azar
@@ -231,10 +230,10 @@ BEGIN
         -- Fecha de compra aleatoria en últimos 5 años
         fecha_compra := NOW() - (trunc(random() * 1825) || ' days')::interval;
         
+        -- Insertar los datos
         INSERT INTO "Hechos_compras" (
             fecha_compra,
             monto,
-            concesionaria,
             id_auto,
             id_modelo,
             id_concesionaria,
@@ -244,7 +243,6 @@ BEGIN
         ) VALUES (
             fecha_compra,
             monto_val,
-            concesionaria_id,
             auto_record.patente,
             modelo_id,
             concesionaria_id,
@@ -254,6 +252,7 @@ BEGIN
         );
     END LOOP;
 END $$;
+
 
 
 --rellenar tabla de hechos_venta

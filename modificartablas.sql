@@ -39,17 +39,16 @@ CREATE TABLE usuarios (
 );
 
 -- Crear tabla Hechos_compras
-CREATE TABLE Hechos_compras (
+CREATE TABLE "Hechos_compras" (
     id_compras SERIAL PRIMARY KEY,
     fecha_compra TIMESTAMP,
     monto DOUBLE PRECISION,
-    concesionaria INTEGER, -- (No tiene FK definida, puede eliminarse o normalizarse)
+    id_concesionaria INTEGER REFERENCES concesionarias(id_concesionarias),
     id_auto VARCHAR REFERENCES autos(patente),
     id_modelo INTEGER REFERENCES modelos(id_modelo),
-    id_concesionaria VARCHAR, -- (No tiene FK definida)
-    id_ciudad INTEGER,
-    id_region INTEGER,
-    id_comuna INTEGER
+    id_ciudad INTEGER REFERENCES ciudades (id_ciudades),
+    id_region INTEGER REFERENCES region (id_region),
+    id_comuna INTEGER REFERENCES comunas (id_comuna)
 );
 
 -- Crear tabla Hechos_ventas
@@ -73,11 +72,6 @@ CREATE TABLE region (
     nombre_region VARCHAR
 );
 
---conecta la tabla region con compras
-ALTER TABLE "Hechos_compras"
-ADD CONSTRAINT fk_hechoscompras_region
-FOREIGN KEY (id_region)
-REFERENCES region (id_region);
 
 --conecta la tabla region con compras
 ALTER TABLE "Hechos_ventas"
@@ -100,16 +94,6 @@ CREATE TABLE comunas (
 );
 
 
--- Para Hechos_compras con ciudades y comunas
-ALTER TABLE "Hechos_compras"
-ADD CONSTRAINT fk_hechoscompras_comuna
-FOREIGN KEY (id_comuna)
-REFERENCES comunas (id_comuna);
-
-ALTER TABLE "Hechos_compras"
-ADD CONSTRAINT fk_hechoscompras_ciudad
-FOREIGN KEY (id_ciudad)
-REFERENCES ciudades (id_ciudades);
 
 -- Para Hechos_ventas con ciudades y comunas
 ALTER TABLE "Hechos_ventas"

@@ -42,4 +42,8 @@ A continuación se explican características y como funciona el sistema a implem
 
 -Cada concesionaria posee una lista con sus respectivos autos vendidos y información sobre la venta. Como si el pago fué concretado al contado o en cuotas, nombre del adquisisor, número de patente y fecha de venta. 
 
- 
+ # Modelo relacional de la base de datos transaccional 
+![Esquema_Base_Datos](https://github.com/user-attachments/assets/3c0f43af-0211-4577-a567-676f82c071e4)
+
+# Modelo relacional de la base de datos de análisis
+

@@ -46,4 +46,6 @@ A continuación se explican características y como funciona el sistema a implem
 ![Esquema_Base_Datos](https://github.com/user-attachments/assets/3c0f43af-0211-4577-a567-676f82c071e4)
 
 # Modelo relacional de la base de datos de análisis
+![Esquema_Hechoscompras](https://github.com/user-attachments/assets/8e1e4330-198c-4336-ae54-52d1d049aad7)
+![Esquema_Hechosventa](https://github.com/user-attachments/assets/af9a9423-b45c-41c4-a61e-3c0fd733596b)
 

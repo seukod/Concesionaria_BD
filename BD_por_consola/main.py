@@ -1,30 +1,7 @@
 import os
-from db_utils import create_row, read_rows, update_row, delete_row
-
-def crear_auto():
-    marca = input("Marca: ")
-    modelo = input("Modelo: ")
-    anio = input("Año: ")
-    create_row("autos", ["marca", "modelo", "anio"], [marca, modelo, anio])
-    print("Auto creado.")
-
-def leer_autos():
-    colnames, rows = read_rows("autos")
-    print(colnames)
-    for row in rows:
-        print(row)
-
-def actualizar_auto():
-    id_auto = input("ID del auto a actualizar: ")
-    campo = input("Campo a actualizar (marca/modelo/anio): ")
-    valor = input(f"Nuevo valor para {campo}: ")
-    update_row("autos", "id", id_auto, [campo], [valor])
-    print("Auto actualizado.")
-
-def eliminar_auto():
-    id_auto = input("ID del auto a eliminar: ")
-    delete_row("autos", "id", id_auto)
-    print("Auto eliminado.")
+from config import *
+from autos import *
+from ventas import *
 
 def opcion_modificacion(tabla):
     while True:
@@ -34,25 +11,39 @@ def opcion_modificacion(tabla):
         print("3. Actualizar fila")
         print("4. Eliminar fila")
         print("5. Volver al menú de modificaciones")
+        
         opcion = input("Seleccione una opción: ")
-
-        if opcion == "1":
-            print(f"Funcionalidad para crear fila en {tabla} (por implementar)")
-            crear_auto()
-        elif opcion == "2":
-            print(f"Funcionalidad para leer datos de {tabla} (por implementar)")
-            leer_autos()
-        elif opcion == "3":
-            print(f"Funcionalidad para actualizar fila en {tabla} (por implementar)")
-            actualizar_auto()
-        elif opcion == "4":
-            print(f"Funcionalidad para eliminar fila en {tabla} (por implementar)")
-            eliminar_auto()
-        elif opcion == "5":
-            menu_modificaciones()
-        else:
-            print("Opción no válida. Intente de nuevo.")
-
+        if tabla == "autos":  
+            if opcion == "1":
+                
+                crear_auto()
+            elif opcion == "2":
+                
+                leer_autos()
+            elif opcion == "3":
+            
+                actualizar_auto()
+            elif opcion == "4":
+                eliminar_auto()
+            elif opcion == "5":
+                return
+            
+            else:
+                print("Opción no válida. Intente de nuevo.")
+        elif tabla == "ventas":
+            if opcion == "1":
+                crear_venta()
+            elif opcion == "2":
+                leer_ventas()
+            elif opcion == "3":
+                actualizar_venta()
+            elif opcion == "4":
+                eliminar_venta()
+            elif opcion == "5":
+                return
+            else:
+                print("Opción no válida. Intente de nuevo.")
+    
 def menu_modificaciones():
     while True: 
         print("\n--- Menú de Modificaciones ---")
@@ -90,6 +81,8 @@ def rellenar_base_datos():
         print("Error al ejecutar el script SQL:", e)
 
 def main():
+    create_database_if_not_exists()
+    run_schema_script()
     while True:
         print("\n--- Menú Principal ---")
         print("1. Modificaciones (compras/ventas)")

@@ -1,7 +1,9 @@
 import os
-
+# HAY QUE ELEGIR DOS TABLAS A MODIFICAR Y HACER QUE EL USUARIO PUEDA ELEGIR ENTRE ELLAS
+# TAMBIÉN HAY QUE HACER QUE EL USUARIO ELIJA ENTRE CUALQUIER OPCION CRUD DE LAS TABLAS
+# POR LO TANTO ESTA FUNCION HAY QUE MODIFICARLA
 def menu_modificaciones():
-    while True:
+    while True: 
         print("\n--- Menú de Modificaciones ---")
         print("1. Modificar compras (por implementar)")
         print("2. Modificar ventas (por implementar)")

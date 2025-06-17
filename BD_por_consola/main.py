@@ -2,17 +2,39 @@ import os
 # HAY QUE ELEGIR DOS TABLAS A MODIFICAR Y HACER QUE EL USUARIO PUEDA ELEGIR ENTRE ELLAS
 # TAMBIÉN HAY QUE HACER QUE EL USUARIO ELIJA ENTRE CUALQUIER OPCION CRUD DE LAS TABLAS
 # POR LO TANTO ESTA FUNCION HAY QUE MODIFICARLA
+
+def opcion_modificacion(): #qué opcion del CRUD
+    while True:
+        print("\n--- Opción de modificación ---")
+        print("1. Crear fila")
+        print("2. Leer datos")
+        print("3. Actualizar tabla")
+        print("4. Eliminar fila")
+        print("5. Volver al menú principal")
+        opcion = input("Seleccione una opción: ")
+        
+        if opcion == "1":
+            break
+        elif opcion == "2":
+            break
+        elif opcion == "3":
+            break
+        elif opcion == "4":
+            break
+        elif opcion == "5":
+            menu_modificaciones()
+
 def menu_modificaciones():
     while True: 
         print("\n--- Menú de Modificaciones ---")
-        print("1. Modificar compras (por implementar)")
-        print("2. Modificar ventas (por implementar)")
+        print("1. Modificar tabla Autos (por implementar)")
+        print("2. Modificar tabla de Ventas (por implementar)")
         print("3. Volver al menú principal")
         opcion = input("Seleccione una opción: ")
         if opcion == "1":
-            print("Funcionalidad para modificar compras aún no implementada.")
+            opcion_modificacion()
         elif opcion == "2":
-            print("Funcionalidad para modificar ventas aún no implementada.")
+            opcion_modificacion()
         elif opcion == "3":
             break
         else:

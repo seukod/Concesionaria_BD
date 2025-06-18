@@ -3,6 +3,10 @@ from config import *
 from autos import *
 from ventas import *
 
+def limpiar_consola():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+
 def opcion_modificacion(tabla):
     while True:
         print(f"\n--- Opción de modificación en tabla {tabla} ---")
@@ -13,6 +17,7 @@ def opcion_modificacion(tabla):
         print("5. Volver al menú de modificaciones")
         
         opcion = input("Seleccione una opción: ")
+        limpiar_consola()
         if tabla == "autos":  
             if opcion == "1":
                 
@@ -46,14 +51,17 @@ def opcion_modificacion(tabla):
     
 def menu_modificaciones():
     while True: 
+        limpiar_consola()
         print("\n--- Menú de Modificaciones ---")
         print("1. Modificar tabla Autos")
         print("2. Modificar tabla de Ventas")
         print("3. Volver al menú principal")
-        opcion = input("Seleccione una opción: ")
+        opcion = input("Seleccione una opción: ") 
         if opcion == "1":
+            limpiar_consola()
             opcion_modificacion("autos")
         elif opcion == "2":
+            limpiar_consola()
             opcion_modificacion("ventas")
         elif opcion == "3":
             break
@@ -89,8 +97,10 @@ def main():
         print("2. Rellenar base de datos transaccional")
         print("3. Salir")
         opcion = input("Seleccione una opción: ")
+        limpiar_consola() 
         if opcion == "1":
             menu_modificaciones()
+            limpiar_consola()
         elif opcion == "2":
             rellenar_base_datos()
         elif opcion == "3":

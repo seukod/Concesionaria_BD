@@ -1,19 +1,39 @@
 import os
 import psycopg2
+import sys
 
+def iniciar_usuario():
+    import getpass
+
+    user = input("Ingrese el nombre de usuario de PostgreSQL: ")
+    if not user:
+        user = "postgres"
+        print("Usuario postgres por defecto.")
+    password = getpass.getpass("Ingrese la contraseña de PostgreSQL: ")
+    return user, password
+
+user, password = iniciar_usuario()
 
 DB_CONFIG = {
     "host": "localhost",
     "port": 5432,
     "database": "postgres",
-    "user": "postgres",
-    "password": "minecraft"
+    "user": user,
+    "password": password
 }
+
 def create_database_if_not_exists():
-    # Conectar a la base de datos postgres por defecto
     tmp_config = DB_CONFIG.copy()
     tmp_config["database"] = "postgres"
-    conn = psycopg2.connect(**tmp_config)
+    try:
+        conn = psycopg2.connect(**tmp_config)
+    except psycopg2.OperationalError as e:
+        if 'password authentication failed' in str(e):
+            print("Error: contraseña incorrecta. El programa se cerrará.")
+            sys.exit(1)
+        else:
+            print("Error de conexión:", e)
+            sys.exit(1)
     conn.autocommit = True
     cur = conn.cursor()
     cur.execute("SELECT 1 FROM pg_database WHERE datname = 'db_transac'")

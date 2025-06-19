@@ -69,11 +69,11 @@ def menu_modificaciones():
             print("Opción no válida. Intente de nuevo.")
 
 def rellenar_base_datos():
-    sql_path = os.path.join(os.path.dirname(__file__), '..', 'agregar_datos.sql')
+    sql_path = os.path.join(os.path.dirname(__file__), '..', 'ingresar_datos_tra.sql')
     sql_path = os.path.abspath(sql_path)
     print(f"Ejecutando script SQL: {sql_path}")
     import psycopg2
-    from .config import DB_CONFIG
+    from config import DB_CONFIG
 
     with open(sql_path, 'r', encoding='utf-8') as f:
         sql = f.read()

@@ -7,10 +7,16 @@ def limpiar_consola():
 def crear_auto():
     limpiar_consola()
     try:
-        marca = input("Marca: ")
+        patente = input("Ingrece patente (son 6 carcteres y las letras en mayuscula): ")
+        precio = input("Ingrese precio: ")
+        auto_prueba = input("Ingrese auto prueba (True/False): ")
+        disponible = input("¿Está disponible? (True/False): ")
+        fecha_llegada = input("Fecha de ingreso (dd/mm/yyyy): ")
+        kilometraje = input("Kilometraje: ")
         modelo = input("Modelo: ")
-        anio = input("Año: ")
-        create_row("autos", ["marca", "modelo", "anio"], [marca, modelo, anio])
+        
+        create_row("autos", ["patente","precio","auto_prueba","disponible","fecha_llegada","kilometraje", "modelo"],
+                    [patente, precio, auto_prueba,disponible,fecha_llegada,kilometraje, modelo])
         print("Auto creado.")
     except Exception as e:
         print(f"Error al crear el auto: {e}")

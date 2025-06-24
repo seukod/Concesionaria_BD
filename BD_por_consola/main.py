@@ -2,7 +2,7 @@ import os
 from config import *
 from autos import *
 from ventas import *
-
+import ETL
 def limpiar_consola():
     os.system('cls' if os.name == 'nt' else 'clear')
 
@@ -56,6 +56,7 @@ def menu_modificaciones():
         print("1. Modificar tabla Autos")
         print("2. Modificar tabla de Ventas")
         print("3. Volver al menú principal")
+        
         opcion = input("Seleccione una opción: ") 
         if opcion == "1":
             limpiar_consola()
@@ -65,8 +66,14 @@ def menu_modificaciones():
             opcion_modificacion("ventas")
         elif opcion == "3":
             break
+        
         else:
             print("Opción no válida. Intente de nuevo.")
+        
+
+def ejecutar_etl():
+    ETL.main()
+    print("ETL ejecutado exitosamente.")
 
 def rellenar_base_datos():
     sql_path = os.path.join(os.path.dirname(__file__), '..', 'ingresar_datos_tra.sql')
@@ -96,6 +103,7 @@ def main():
         print("1. Modificaciones (compras/ventas)")
         print("2. Rellenar base de datos transaccional")
         print("3. Salir")
+        print("4. Ejecutar ETL (opcional)")
         opcion = input("Seleccione una opción: ")
         limpiar_consola() 
         if opcion == "1":
@@ -106,6 +114,9 @@ def main():
         elif opcion == "3":
             print("Saliendo del programa.")
             break
+        elif opcion == "4":
+            print("Ejecutando ETL...")
+            ejecutar_etl()
         else:
             print("Opción no válida. Intente de nuevo.")
 

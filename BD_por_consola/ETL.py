@@ -5,9 +5,9 @@ import time
 def extract():
     conn = get_connection()
     cur = conn.cursor()
-    # Extrae los datos necesarios del modelo transaccional
     cur.execute("""
-        SELECT v.id_venta, v.id_concesionaria, v.id_usuario, v.id_auto, v.monto, v.fecha_venta, a.precio
+        SELECT v.id_venta, v.id_concesionaria, v.id_usuario, v.id_auto, v.monto, v.fecha_venta, 
+               a.modelo
         FROM ventas v
         JOIN autos a ON v.id_auto = a.patente
     """)
@@ -15,7 +15,6 @@ def extract():
     cur.close()
     conn.close()
     return datos
-
 def transform(datos):
     # Aquí puedes transformar los datos si es necesario
     # Por ejemplo, podrías calcular márgenes, formatos de fecha, etc.
@@ -26,7 +25,7 @@ def load(datos):
     conn = get_connection()
     cur = conn.cursor()
     # 1. Elimina todos los datos de la tabla de hechos
-    cur.execute("DELETE FROM hechos_ventas")
+    cur.execute('DELETE FROM hechos_ventas')
     # 2. Inserta los datos transformados
     for fila in datos:
         cur.execute("""

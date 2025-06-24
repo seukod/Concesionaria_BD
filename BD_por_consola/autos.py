@@ -33,6 +33,12 @@ def actualizar_auto():
         id_auto = input("ID del auto a actualizar: ")
         campo = input("Campo a actualizar (marca/modelo/anio): ")
         valor = input(f"Nuevo valor para {campo}: ")
+        
+        # Verificar si el ID existe
+        _, rows = read_rows("autos", "id", id_auto)
+        if not rows:
+            raise Exception("Auto no encontrado.")
+        
         update_row("autos", "id", id_auto, [campo], [valor])
         print("Auto actualizado.")
     except Exception as e:
@@ -43,6 +49,12 @@ def eliminar_auto():
     limpiar_consola()
     try:
         id_auto = input("ID del auto a eliminar: ")
+
+        # Verificar si el ID existe
+        _, rows = read_rows("autos", "id", id_auto)
+        if not rows:
+            raise Exception("Auto no encontrado.")
+
         delete_row("autos", "id", id_auto)
         print("Auto eliminado.")
     except Exception as e:

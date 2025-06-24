@@ -18,8 +18,8 @@ DB_CONFIG = {
     "host": "localhost",
     "port": 5432,
     "database": "postgres",
-    "user": user,
-    "password": password
+    "user": "postgres",
+    "password": "postgres"
 }
 
 def create_database_if_not_exists():

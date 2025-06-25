@@ -1,3 +1,6 @@
+CREATE SCHEMA IF NOT EXISTS transaccional;
+SET search_path TO transaccional;
+
 -- Borrar datos en orden correcto (dependientes primero)
 TRUNCATE TABLE 
     ventas,
@@ -299,8 +302,9 @@ DECLARE
     digitos TEXT;
     patente_auto TEXT;
     modelo_id INTEGER;
+    limite INTEGER := 100; -- <--- Cambia aquí la cantidad de autos de prueba
 BEGIN
-    WHILE i < 18000 LOOP
+    WHILE i < limite LOOP
         -- Generar patente tipo AAAA01
         letras := chr(trunc(65 + random() * 26)::int) ||
                   chr(trunc(65 + random() * 26)::int) ||
@@ -341,8 +345,9 @@ DECLARE
     nombres TEXT[] := ARRAY['Juan', 'María', 'Pedro', 'Ana', 'Luis', 'Carla', 'José', 'Camila', 'Felipe', 'Sofía', 'Diego', 'Isabel', 'Jorge', 'Lucía', 'Andrés', 'Paula', 'Ricardo', 'Claudia', 'Tomás', 'Marta'];
     apellidos TEXT[] := ARRAY['González', 'Rodríguez', 'Muñoz', 'Pérez', 'Soto', 'Rojas', 'Contreras', 'Silva', 'Martínez', 'Torres', 'Flores', 'López', 'Castillo', 'Vargas', 'Cruz', 'Molina', 'Fuentes', 'Vega', 'Orellana', 'Herrera'];
     profesiones TEXT[] := ARRAY['Ingeniero', 'Profesor', 'Médico', 'Abogado', 'Arquitecto', 'Contador', 'Periodista', 'Enfermero', 'Diseñador', 'Técnico', 'Administrativo', 'Psicólogo', 'Electrónico', 'Veterinario', 'Químico'];
+    limite INTEGER := 50; -- <--- Cambia aquí la cantidad de usuarios de prueba
 BEGIN
-    WHILE i < 9000 LOOP
+    WHILE i < limite LOOP
         rut_generado := (random() * (25000000 - 1000000) + 1000000)::int;
 
         -- Verificar si ya existe ese rut
@@ -374,6 +379,7 @@ DECLARE
     mes_offset INTEGER;
     dia_del_mes INTEGER;
     i INTEGER := 0;
+    limite INTEGER := 100; -- <--- Cambia aquí la cantidad de compras de prueba
 BEGIN
     -- Recorremos todos los autos que aún no han sido comprados
     FOR auto IN
@@ -385,7 +391,7 @@ BEGIN
         ORDER BY random()
     LOOP
         -- Salir si se generan más de 18000 compras
-        EXIT WHEN i >= 18000;
+        EXIT WHEN i >= limite;
 
         -- Elegir concesionaria aleatoria
         SELECT id_concesionarias INTO concesionaria_id
@@ -430,6 +436,7 @@ DECLARE
     fecha_venta TIMESTAMP;
     mes_offset INTEGER;
     dia_del_mes INTEGER;
+    limite INTEGER := 100; -- <--- Cambia aquí la cantidad de ventas de prueba
 BEGIN
     -- Recorre autos que fueron comprados, evita autos repetidos
     FOR venta IN
@@ -438,7 +445,7 @@ BEGIN
         WHERE a.patente IN (SELECT id_auto FROM compras)
         ORDER BY random()
     LOOP
-        EXIT WHEN i >= 18000;
+        EXIT WHEN i >= limite;
 
         -- Elegir usuario aleatorio
         SELECT rut, socio INTO usuario

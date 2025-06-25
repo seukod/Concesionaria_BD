@@ -2,6 +2,7 @@ import os
 from config import *
 from autos import *
 from ventas import *
+from etl import run_etl  # <-- Añade esta línea
 
 def limpiar_consola():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -90,12 +91,13 @@ def rellenar_base_datos():
 
 def main():
     create_database_if_not_exists()
-    run_schema_script()
+    run_schema_scripts()
     while True:
         print("\n--- Menú Principal ---")
         print("1. Modificaciones (compras/ventas)")
         print("2. Rellenar base de datos transaccional")
-        print("3. Salir")
+        print("3. Ejecutar ETL")
+        print("4. Salir")
         opcion = input("Seleccione una opción: ")
         limpiar_consola() 
         if opcion == "1":
@@ -104,6 +106,8 @@ def main():
         elif opcion == "2":
             rellenar_base_datos()
         elif opcion == "3":
+            run_etl()
+        elif opcion == "4":
             print("Saliendo del programa.")
             break
         else:

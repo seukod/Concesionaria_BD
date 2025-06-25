@@ -1,5 +1,9 @@
+CREATE SCHEMA IF NOT EXISTS analisis;
+
+SET search_path TO analisis;
+
 -- Crear tabla modelos
-CREATE TABLE modelos (
+CREATE TABLE IF NOT EXISTS modelos (
     id_modelo SERIAL PRIMARY KEY,
     nombre_modelo VARCHAR,
     cantidad_puertas INTEGER,
@@ -12,7 +16,7 @@ CREATE TABLE modelos (
 );
 
 -- Crear tabla autos
-CREATE TABLE autos (
+CREATE TABLE IF NOT EXISTS autos (
     patente VARCHAR PRIMARY KEY,
     precio DOUBLE PRECISION,
     auto_prueba BOOLEAN,
@@ -23,14 +27,14 @@ CREATE TABLE autos (
 );
 
 -- Crear tabla concesionarias
-CREATE TABLE concesionarias (
+CREATE TABLE IF NOT EXISTS concesionarias (
     id_concesionarias INTEGER PRIMARY KEY,
     direccion VARCHAR,
     capacidad_vehicular INTEGER
 );
 
 -- Crear tabla usuarios
-CREATE TABLE usuarios (
+CREATE TABLE IF NOT EXISTS usuarios (
     rut INTEGER PRIMARY KEY,
     nombre VARCHAR,
     apellido VARCHAR,
@@ -39,7 +43,7 @@ CREATE TABLE usuarios (
 );
 
 -- Crear tabla Hechos_compras
-CREATE TABLE "Hechos_compras" (
+CREATE TABLE IF NOT EXISTS "Hechos_compras" (
     id_compras SERIAL PRIMARY KEY,
     fecha_compra TIMESTAMP,
     monto DOUBLE PRECISION,
@@ -52,7 +56,7 @@ CREATE TABLE "Hechos_compras" (
 );
 
 -- Crear tabla Hechos_ventas
-CREATE TABLE Hechos_ventas (
+CREATE TABLE IF NOT EXISTS Hechos_ventas (
     id_venta SERIAL PRIMARY KEY,
     id_concesionaria INTEGER REFERENCES concesionarias(id_concesionarias),
     id_usuario INTEGER REFERENCES usuarios(rut),
@@ -67,41 +71,17 @@ CREATE TABLE Hechos_ventas (
 
 
 --crea la tabla region
-CREATE TABLE region (
+CREATE TABLE IF NOT EXISTS region (
     id_region INTEGER PRIMARY KEY,
     nombre_region VARCHAR
 );
 
-
---conecta la tabla region con compras
-ALTER TABLE "Hechos_ventas"
-ADD CONSTRAINT fk_hechosventas_region
-FOREIGN KEY (id_region)
-REFERENCES region (id_region);
-
-
---crear la tabla ciudades
-CREATE TABLE ciudades (
+CREATE TABLE IF NOT EXISTS ciudades (
     id_ciudades INTEGER PRIMARY KEY,
     nombre_ciudades VARCHAR NOT NULL
 );
 
-
---crear tabla comunas
-CREATE TABLE comunas (
+CREATE TABLE IF NOT EXISTS comunas (
     id_comuna INTEGER PRIMARY KEY,
     nombre_comuna VARCHAR NOT NULL
 );
-
-
-
--- Para Hechos_ventas con ciudades y comunas
-ALTER TABLE "Hechos_ventas"
-ADD CONSTRAINT fk_hechosventas_comuna
-FOREIGN KEY (id_comuna)
-REFERENCES comunas (id_comuna);
-
-ALTER TABLE "Hechos_ventas"
-ADD CONSTRAINT fk_hechosventas_ciudad
-FOREIGN KEY (id_ciudad)
-REFERENCES ciudades (id_ciudades);

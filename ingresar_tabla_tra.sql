@@ -1,32 +1,36 @@
+CREATE SCHEMA IF NOT EXISTS transaccional;
+
+SET search_path TO transaccional;
+
 -- Tabla región
-CREATE TABLE region (
+CREATE TABLE IF NOT EXISTS region (
     id_region SERIAL PRIMARY KEY,
     nombre_region VARCHAR
 );
 
 -- Tabla comuna
-CREATE TABLE comuna (
+CREATE TABLE IF NOT EXISTS comuna (
     id_comuna SERIAL PRIMARY KEY,
     id_region_perteneciente INTEGER REFERENCES region(id_region),
     nombre_comuna VARCHAR
 );
 
 -- Tabla ciudad
-CREATE TABLE ciudad (
+CREATE TABLE IF NOT EXISTS ciudad (
     id_ciudad SERIAL PRIMARY KEY,
     id_comuna_perteneciente INTEGER REFERENCES comuna(id_comuna),
     nombre_ciudad VARCHAR
 );
 
 -- Tabla concesionarias
-CREATE TABLE concesionarias (
+CREATE TABLE IF NOT EXISTS concesionarias (
     id_concesionarias SERIAL PRIMARY KEY,
     direccion VARCHAR,
     id_ciudad_concesionaria INTEGER REFERENCES ciudad(id_ciudad)
 );
 
 -- Tabla modelos
-CREATE TABLE modelos (
+CREATE TABLE IF NOT EXISTS modelos (
     id_modelo SERIAL PRIMARY KEY,
     nombre_modelo VARCHAR,
     cantidad_puertas INTEGER,
@@ -39,7 +43,7 @@ CREATE TABLE modelos (
 );
 
 -- Tabla autos
-CREATE TABLE autos (
+CREATE TABLE IF NOT EXISTS autos (
     patente VARCHAR PRIMARY KEY,
     precio FLOAT,
     auto_prueba BOOLEAN,
@@ -50,7 +54,7 @@ CREATE TABLE autos (
 );
 
 -- Tabla compras
-CREATE TABLE compras (
+CREATE TABLE IF NOT EXISTS compras (
     id_compras SERIAL PRIMARY KEY,
     fecha_compra TIMESTAMP,
     monto FLOAT,
@@ -59,7 +63,7 @@ CREATE TABLE compras (
 );
 
 -- Tabla transferencias
-CREATE TABLE transferencias (
+CREATE TABLE IF NOT EXISTS transferencias (
     id_transferencia SERIAL PRIMARY KEY,
     desde INTEGER REFERENCES concesionarias(id_concesionarias),
     hasta INTEGER REFERENCES concesionarias(id_concesionarias),
@@ -68,7 +72,7 @@ CREATE TABLE transferencias (
 );
 
 -- Tabla usuarios
-CREATE TABLE usuarios (
+CREATE TABLE IF NOT EXISTS usuarios (
     rut INTEGER PRIMARY KEY,
     nombre VARCHAR,
     apellido VARCHAR,
@@ -77,7 +81,7 @@ CREATE TABLE usuarios (
 );
 
 -- Tabla ventas
-CREATE TABLE ventas (
+CREATE TABLE IF NOT EXISTS ventas (
     id_venta SERIAL PRIMARY KEY,
     id_concesionaria INTEGER REFERENCES concesionarias(id_concesionarias),
     id_usuario INTEGER REFERENCES usuarios(rut),

@@ -46,20 +46,31 @@ def create_database_if_not_exists():
     cur.close()
     conn.close()
 
-def run_schema_script():
-    if tabla_existe('region'):
-        print("La tabla 'region' ya existe. No se ejecuta el script de esquema.")
-        return
-    script_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'ingresar_tabla_tra.sql'))
-    with open(script_path, 'r', encoding='utf-8') as f:
-        sql = f.read()
+def run_schema_scripts():
+    import psycopg2
+    # Ejecuta el script de transaccional
+    tra_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'ingresar_tabla_tra.sql'))
+    with open(tra_path, 'r', encoding='utf-8') as f:
+        sql_tra = f.read()
     conn = psycopg2.connect(**DB_CONFIG)
     cur = conn.cursor()
-    cur.execute(sql)
+    cur.execute(sql_tra)
     conn.commit()
+    print("Esquema 'transaccional' creado o actualizado.")
     cur.close()
     conn.close()
-    print("Esquema creado en 'db_transac'.")
+
+    # Ejecuta el script de analisis
+    ana_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'modificartablas.sql'))
+    with open(ana_path, 'r', encoding='utf-8') as f:
+        sql_ana = f.read()
+    conn = psycopg2.connect(**DB_CONFIG)
+    cur = conn.cursor()
+    cur.execute(sql_ana)
+    conn.commit()
+    print("Esquema 'analisis' creado o actualizado.")
+    cur.close()
+    conn.close()
 
 def tabla_existe(nombre_tabla):
     conn = psycopg2.connect(**DB_CONFIG)
@@ -87,7 +98,8 @@ def create_row(table, columns, values):
 def read_rows(table):
     conn = get_connection()
     cur = conn.cursor()
-    query = f"SELECT * FROM {table}"
+    # Cambia aquí: agrega el esquema transaccional
+    query = f'SELECT * FROM transaccional.{table}'
     cur.execute(query)
     rows = cur.fetchall()
     colnames = [desc[0] for desc in cur.description]

@@ -2,7 +2,7 @@ import os
 from config import *
 from autos import *
 from ventas import *
-from etl import run_etl  # <-- Añade esta línea
+from etl import run_etl
 
 def limpiar_consola():
     os.system('cls' if os.name == 'nt' else 'clear')

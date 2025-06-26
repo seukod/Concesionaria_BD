@@ -188,13 +188,22 @@ def extract_hechos_ventas():
     cur.execute("""
         SELECT 
             v.id_venta, 
-            c.id_concesionarias AS id_concesionaria,
+            comp.concesionaria AS id_concesionaria,
+            comp.id_usuario,
+            comp.id_auto,
+            v.monto,
+            v.fecha_venta,
+            a.modelo AS id_modelo,
+            cd.id_ciudad,
+            r.id_region,
             ci.id_comuna
         FROM transaccional.ventas v
         LEFT JOIN transaccional.compras comp ON v.id_venta = comp.id_compras
+        LEFT JOIN transaccional.autos a ON comp.id_auto = a.patente
         LEFT JOIN transaccional.concesionarias c ON comp.concesionaria = c.id_concesionarias
         LEFT JOIN transaccional.ciudad cd ON c.id_ciudad_concesionaria = cd.id_ciudad
         LEFT JOIN transaccional.comuna ci ON cd.id_comuna_perteneciente = ci.id_comuna
+        LEFT JOIN transaccional.region r ON ci.id_region_perteneciente = r.id_region
     """)
     rows = cur.fetchall()
     cur.close()
@@ -203,7 +212,28 @@ def extract_hechos_ventas():
         {
             "id_venta": row[0],
             "id_concesionaria": row[1],
-            "id_comuna": row[2]
+            "id_usuario": row[2],
+            "id_auto": row[3],
+            "monto": row[4],
+            "fecha_venta": row[5],
+            "id_modelo": row[6],
+            "id_ciudad": row[7],
+            "id_region": row[8],
+            "id_comuna": row[9]
         }
         for row in rows
     ]
+
+def load_hechos_ventas(data):
+    for row in data:
+        query = """
+            INSERT INTO analisis.hechos_ventas
+            (id_venta, id_concesionaria, id_usuario, id_auto, monto, fecha_venta, id_modelo, id_ciudad, id_region, id_comuna)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            ON CONFLICT (id_venta) DO NOTHING
+        """
+        params = (
+            row["id_venta"], row["id_concesionaria"], row["id_usuario"], row["id_auto"], row["monto"],
+            row["fecha_venta"], row["id_modelo"], row["id_ciudad"], row["id_region"], row["id_comuna"]
+        )
+        execute_query(query, params)

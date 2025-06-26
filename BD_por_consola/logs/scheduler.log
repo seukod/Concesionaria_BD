@@ -1,0 +1,16 @@
+2025-06-26 12:16:45,173 - INFO - === INICIANDO ETL SEMANAL DOMINICAL ===
+2025-06-26 12:16:47,051 - INFO - === ETL SEMANAL COMPLETADO EXITOSAMENTE ===
+2025-06-26 12:16:47,052 - INFO - === INICIANDO LIMPIEZA SEMANAL DOMINICAL ===
+2025-06-26 12:16:47,052 - INFO - Limpieza de logs: 0 archivos eliminados
+2025-06-26 12:16:47,119 - INFO - VACUUM ejecutado exitosamente en todas las tablas principales
+2025-06-26 12:16:47,158 - ERROR - Error al obtener estadísticas: no existe la columna «tablename»
+LINE 2:             SELECT schemaname, tablename, n_tup_ins, n_tup_u...
+                                       ^
+
+2025-06-26 12:16:47,158 - INFO - === LIMPIEZA SEMANAL COMPLETADA EXITOSAMENTE ===
+2025-06-26 12:16:47,159 - INFO - === GENERANDO REPORTE SEMANAL ===
+2025-06-26 12:16:47,198 - INFO - REPORTE SEMANAL - 2025-06-26
+2025-06-26 12:16:47,198 - INFO - Total de autos: 2000
+2025-06-26 12:16:47,198 - INFO - Total de ventas: 2000
+2025-06-26 12:16:47,198 - INFO - Total de hechos de ventas (análisis): 2000
+2025-06-26 12:16:47,199 - INFO - Última venta registrada: 2025-06-29 00:00:00

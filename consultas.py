@@ -13,7 +13,7 @@ import matplotlib.ticker as mtick
 def conectar():
     return psycopg2.connect(
         host="localhost",
-        password="minecraft",
+        password="5540",
         port="5432",
         database="postgres",
         user="postgres"
@@ -33,6 +33,29 @@ def ventas_por_mes(conn, anio):
         resultados = cursor.fetchall()
 
     # Mostrar en consola
+    print(f"\n=== VENTAS POR MES - {anio} ===")
+    if not resultados:
+        print(f"❌ No se encontraron ventas para el año {anio}")
+        
+        # Consulta de diagnóstico
+        debug_query = """
+        SELECT TO_CHAR(hv.fecha_venta, 'YYYY') as año, COUNT(*) as total_ventas
+        FROM analisis.hechos_ventas hv
+        GROUP BY TO_CHAR(hv.fecha_venta, 'YYYY')
+        ORDER BY año;
+        """
+        cursor.execute(debug_query)
+        años_disponibles = cursor.fetchall()
+        
+        if años_disponibles:
+            print("Años disponibles en la base de datos:")
+            for año, total in años_disponibles:
+                print(f"  - {año}: {total} ventas")
+        else:
+            print("❌ No hay datos de ventas en la tabla analisis.hechos_ventas")
+        
+        return []
+    
     for anomes, count in resultados:
         print(f"{anomes}: {count}")
 
@@ -51,13 +74,19 @@ def ventas_por_mes(conn, anio):
             except:
                 anomes.append(fecha)  # fallback si algo falla
 
-        plt.figure(figsize=(10, 5))
-        sns.barplot(x=anomes, y=cantidad, palette="Blues_d")
+        plt.figure(figsize=(12, 6))
+        sns.barplot(x=list(range(len(anomes))), y=cantidad, palette="Blues_d")
 
-        plt.title(f'Ventas por mes - {anio}')
-        plt.xticks(rotation=45)
+        plt.title(f'Ventas por mes - {anio}', fontsize=14, fontweight='bold')
+        plt.xticks(range(len(anomes)), anomes, rotation=45)
         plt.ylabel('Cantidad de ventas')
         plt.xlabel('Mes')
+        
+        # Agregar valores en las barras
+        for i, v in enumerate(cantidad):
+            plt.text(i, v + max(cantidad) * 0.01, str(v), ha='center', va='bottom', fontweight='bold')
+        
+        plt.grid(axis='y', alpha=0.3)
         plt.tight_layout()
 
         # Crear carpeta si no existe
@@ -65,14 +94,17 @@ def ventas_por_mes(conn, anio):
         os.makedirs(output_dir, exist_ok=True)
         filename = f"{output_dir}/ventas_por_mes_{anio}.png"
 
-        plt.savefig(filename)
+        try:
+            plt.savefig(filename, dpi=300, bbox_inches='tight')
+            print(f"\n✅ Gráfico guardado como: {filename}")
+            print(f"📁 Ubicación: {os.path.abspath(filename)}")
+        except Exception as e:
+            print(f"❌ Error al guardar el gráfico: {e}")
+
         plt.show()
         plt.close()
-
-        print(f"\n Gráfico guardado como: {filename}")
-        print("Guardando gráfico en:", os.path.abspath(output_dir))
     else:
-        print("\n No se encontraron resultados para ese año.")
+        print("\n❌ No se encontraron resultados para ese año.")
 
     return resultados
 
@@ -168,34 +200,85 @@ def top_10_modelos_mas_vendidos(conn, anio):
         cursor.execute(query, (anio,))
         resultados = cursor.fetchall()
 
-    # Extraer datos
+    # Mostrar resultados en consola para debugging
+    print(f"\n=== TOP 10 MODELOS MÁS VENDIDOS - {anio} ===")
+    if not resultados:
+        print(f"❌ No se encontraron ventas para el año {anio}")
+        print("Verificando datos disponibles...")
+        
+        # Consulta de diagnóstico
+        debug_query = """
+        SELECT TO_CHAR(hv.fecha_venta, 'YYYY') as año, COUNT(*) as total_ventas
+        FROM analisis.hechos_ventas hv
+        GROUP BY TO_CHAR(hv.fecha_venta, 'YYYY')
+        ORDER BY año;
+        """
+        cursor.execute(debug_query)
+        años_disponibles = cursor.fetchall()
+        
+        if años_disponibles:
+            print("Años disponibles en la base de datos:")
+            for año, total in años_disponibles:
+                print(f"  - {año}: {total} ventas")
+        else:
+            print("❌ No hay datos de ventas en la tabla analisis.hechos_ventas")
+        
+        return []
+    
+    # Mostrar resultados
+    for i, (modelo, cantidad) in enumerate(resultados, 1):
+        print(f"{i:2d}. {modelo}: {cantidad} unidades")
+
+    # Extraer datos para el gráfico
     modelos = [fila[0] for fila in resultados]
     cantidades = [fila[1] for fila in resultados]
 
+    # Verificar que tenemos datos para graficar
+    if not modelos or not cantidades:
+        print("❌ No hay datos para generar el gráfico")
+        return resultados
+
+    # Truncar nombres largos de modelos para mejor visualización
+    modelos_truncados = [textwrap.fill(modelo, 20) if len(modelo) > 20 else modelo for modelo in modelos]
+
     # Graficar
-    plt.figure(figsize=(10, 6))
-    barras = plt.barh(modelos, cantidades, color='skyblue')
+    plt.figure(figsize=(12, 8))
+    barras = plt.barh(range(len(modelos_truncados)), cantidades, color='skyblue')
+    
+    # Configurar etiquetas y título
     plt.xlabel('Cantidad de unidades vendidas')
     plt.ylabel('Modelos')
-    plt.title(f'Top 10 Modelos más Vendidos - {anio}')
+    plt.title(f'Top 10 Modelos más Vendidos - {anio}', fontsize=14, fontweight='bold')
+    
+    # Configurar etiquetas del eje Y
+    plt.yticks(range(len(modelos_truncados)), modelos_truncados)
     plt.gca().invert_yaxis()  # El más vendido arriba
 
-    for barra in barras:
+    # Agregar valores en las barras
+    for i, barra in enumerate(barras):
         ancho = barra.get_width()
-        plt.text(ancho + 0.1, barra.get_y() + barra.get_height()/2,
-                 str(int(ancho)), va='center')
+        plt.text(ancho + max(cantidades) * 0.01, barra.get_y() + barra.get_height()/2,
+                 str(int(ancho)), va='center', fontweight='bold')
 
+    # Agregar grid para mejor lectura
+    plt.grid(axis='x', alpha=0.3)
+    
     plt.tight_layout()
+    
     # Crear carpeta si no existe
     output_dir = "graficos"
     os.makedirs(output_dir, exist_ok=True)
     filename = f"{output_dir}/top_10_modelos_mas_vendidos_{anio}.png"
-    plt.savefig(filename)
+    
+    try:
+        plt.savefig(filename, dpi=300, bbox_inches='tight')
+        print(f"\n✅ Gráfico guardado como: {filename}")
+        print(f"📁 Ubicación: {os.path.abspath(filename)}")
+    except Exception as e:
+        print(f"❌ Error al guardar el gráfico: {e}")
+    
     plt.show()
     plt.close()
-    
-    print(f"\nGráfico guardado como: {filename}")
-    print("Guardando gráfico en:", os.path.abspath(output_dir))
 
     return resultados
 
@@ -424,45 +507,143 @@ def promedio_precio_venta_por_marca(conn, anio):
 
     return resultados
 
+def diagnosticar_datos(conn):
+    """Función de diagnóstico para verificar qué datos están disponibles en la base de datos"""
+    print("\n" + "="*60)
+    print("               DIAGNÓSTICO DE DATOS")
+    print("="*60)
+    
+    try:
+        with conn.cursor() as cursor:
+            # Verificar tabla hechos_ventas
+            print("\n🔍 VERIFICANDO TABLA hechos_ventas:")
+            cursor.execute("SELECT COUNT(*) FROM analisis.hechos_ventas;")
+            total_ventas = cursor.fetchone()[0]
+            print(f"   Total de registros: {total_ventas}")
+            
+            if total_ventas > 0:
+                cursor.execute("""
+                    SELECT TO_CHAR(fecha_venta, 'YYYY') as año, COUNT(*) as ventas
+                    FROM analisis.hechos_ventas 
+                    GROUP BY TO_CHAR(fecha_venta, 'YYYY')
+                    ORDER BY año;
+                """)
+                años_ventas = cursor.fetchall()
+                print("   Ventas por año:")
+                for año, cantidad in años_ventas:
+                    print(f"     - {año}: {cantidad} ventas")
+                    
+                cursor.execute("""
+                    SELECT MIN(fecha_venta) as fecha_min, MAX(fecha_venta) as fecha_max
+                    FROM analisis.hechos_ventas;
+                """)
+                fechas = cursor.fetchone()
+                print(f"   Rango de fechas: {fechas[0]} a {fechas[1]}")
+            
+            # Verificar tabla modelos
+            print("\n🔍 VERIFICANDO TABLA modelos:")
+            cursor.execute("SELECT COUNT(*) FROM analisis.modelos;")
+            total_modelos = cursor.fetchone()[0]
+            print(f"   Total de modelos: {total_modelos}")
+            
+            if total_modelos > 0:
+                cursor.execute("SELECT nombre_modelo FROM analisis.modelos LIMIT 5;")
+                algunos_modelos = cursor.fetchall()
+                print("   Algunos modelos:")
+                for modelo in algunos_modelos:
+                    print(f"     - {modelo[0]}")
+            
+            # Verificar relación ventas-modelos
+            print("\n🔍 VERIFICANDO RELACIÓN ventas-modelos:")
+            cursor.execute("""
+                SELECT COUNT(DISTINCT hv.id_modelo) as modelos_vendidos,
+                       COUNT(DISTINCT m.id_modelo) as modelos_totales
+                FROM analisis.hechos_ventas hv
+                FULL JOIN analisis.modelos m ON hv.id_modelo = m.id_modelo;
+            """)
+            relacion = cursor.fetchone()
+            print(f"   Modelos que han tenido ventas: {relacion[0]}")
+            print(f"   Total de modelos en catálogo: {relacion[1]}")
+            
+            # Verificar si hay problemas de JOIN
+            cursor.execute("""
+                SELECT COUNT(*) as ventas_sin_modelo
+                FROM analisis.hechos_ventas hv
+                LEFT JOIN analisis.modelos m ON hv.id_modelo = m.id_modelo
+                WHERE m.id_modelo IS NULL;
+            """)
+            ventas_sin_modelo = cursor.fetchone()[0]
+            if ventas_sin_modelo > 0:
+                print(f"   ⚠️  ADVERTENCIA: {ventas_sin_modelo} ventas sin modelo asociado")
+            
+    except Exception as e:
+        print(f"❌ Error durante el diagnóstico: {e}")
+    
+    print("\n" + "="*60)
 
 def main():
     parser = argparse.ArgumentParser(description="Consulta base de datos por año")
     parser.add_argument("anio", help="Año para filtrar datos, formato YYYY")
+    parser.add_argument("--diagnostico", "-d", action="store_true", 
+                       help="Solo ejecutar diagnóstico de datos")
     args = parser.parse_args()
     
-    conn = conectar()
-    #LISTO
-    print(f"\nVentas por mes para el año {args.anio}:")
-    ventas = ventas_por_mes(conn, args.anio)
-    for anomes, count in ventas:
-        print(f"{anomes}: {count}")
-    #LISTO
-    print(f"\nCompras, ventas y diferencia para el año {args.anio}:")
-    datos = compras_ventas_diferencia(conn, args.anio)
-    for anomes, monto_ventas, monto_compras, diferencia in datos:
-        print(f"{anomes}: Ventas={monto_ventas}, Compras={monto_compras}, Diferencia={diferencia}")
-    #LISTO
-    print(f"\nTop 10 modelos más vendidos en {args.anio}:")
-    top_modelos = top_10_modelos_mas_vendidos(conn, args.anio)
-    for nombre_modelo, cantidad in top_modelos:
-        print(f"{nombre_modelo}: {cantidad} ventas")
-    #LISTO
-    print(f"\nModelo más vendido por región en {args.anio}:")
-    modelos_region = modelo_mas_vendido_por_region(conn, args.anio)
-    for id_region, modelo, cantidad in modelos_region:
-        print(f"Región {id_region}: {modelo} ({cantidad} ventas)")
-    #LISTO
-    print(f"\nComparación de autos comprados vs vendidos por región en {args.anio}:")
-    comparacion = comparacion_compras_vs_ventas_por_region(conn, args.anio)
-    for id_region, vendidos, comprados in comparacion:
-        print(f"Región {id_region}: Vendidos={vendidos}, Comprados={comprados}")
-    #LISTO
-    print(f"\nPromedio de precio de venta por marca en {args.anio}:")
-    precios = promedio_precio_venta_por_marca(conn, args.anio)
-    for marca, promedio in precios:
-        print(f"{marca}: ${promedio:.2f}")
+    try:
+        conn = conectar()
+        print(f"✅ Conexión a la base de datos exitosa")
+        
+        # Si solo se quiere diagnóstico
+        if args.diagnostico:
+            diagnosticar_datos(conn)
+            conn.close()
+            return
+        
+        print(f"\n{'='*50}")
+        print(f"  REPORTE DE ANÁLISIS DE VENTAS - {args.anio}")
+        print(f"{'='*50}")
+        
+        # Ejecutar diagnóstico primero
+        diagnosticar_datos(conn)
+        
+        # Ejecutar consultas
+        print(f"\n📊 VENTAS POR MES para el año {args.anio}:")
+        ventas = ventas_por_mes(conn, args.anio)
+        
+        print(f"\n💰 COMPRAS, VENTAS Y DIFERENCIA para el año {args.anio}:")
+        datos = compras_ventas_diferencia(conn, args.anio)
+        for anomes, monto_ventas, monto_compras, diferencia in datos:
+            print(f"{anomes}: Ventas=${monto_ventas:,.0f}, Compras=${monto_compras:,.0f}, Diferencia=${diferencia:,.0f}")
+        
+        print(f"\n🏆 TOP 10 MODELOS MÁS VENDIDOS en {args.anio}:")
+        top_modelos = top_10_modelos_mas_vendidos(conn, args.anio)
+        
+        print(f"\n🗺️ MODELO MÁS VENDIDO POR REGIÓN en {args.anio}:")
+        modelos_region = modelo_mas_vendido_por_region(conn, args.anio)
+        for id_region, modelo, cantidad in modelos_region:
+            print(f"Región {id_region}: {modelo} ({cantidad} ventas)")
+        
+        print(f"\n📈 COMPARACIÓN COMPRAS vs VENTAS POR REGIÓN en {args.anio}:")
+        comparacion = comparacion_compras_vs_ventas_por_region(conn, args.anio)
+        for id_region, vendidos, comprados in comparacion:
+            print(f"Región {id_region}: Vendidos={vendidos}, Comprados={comprados}")
+        
+        print(f"\n💵 PROMEDIO DE PRECIO DE VENTA POR MARCA en {args.anio}:")
+        precios = promedio_precio_venta_por_marca(conn, args.anio)
+        
+        print(f"\n{'='*50}")
+        print("✅ Análisis completado exitosamente")
+        print(f"📁 Los gráficos se han guardado en la carpeta 'graficos'")
+        print(f"{'='*50}")
 
-    conn.close()
+    except psycopg2.Error as e:
+        print(f"❌ Error de base de datos: {e}")
+    except Exception as e:
+        print(f"❌ Error inesperado: {e}")
+    finally:
+        try:
+            conn.close()
+        except:
+            pass
 
     
 

@@ -13,7 +13,9 @@ def mostrar_menu_principal():
     print("1. Actualizaciones (compras/ventas)")
     print("2. Rellenar base de datos transaccional")
     print("3. Ejecutar ETL")
-    print("4. Salir")
+    print("4. Diagnóstico de rendimiento")
+    print("5. Sistema de Schedule (Tareas Automáticas)")
+    print("6. Salir")
     print("="*50)
 
 def mostrar_menu_modificaciones():
@@ -195,6 +197,95 @@ def inicializar_sistema():
         print("El sistema puede no funcionar correctamente.")
         input("\nPresione Enter para continuar de todos modos...")
 
+def ejecutar_diagnostico():
+    """Ejecuta el diagnóstico de rendimiento del sistema"""
+    try:
+        print("🔍 Iniciando diagnóstico de rendimiento...")
+        print("⏳ Por favor espere...")
+        
+        # Importar y ejecutar diagnóstico
+        from diagnostico_performance import benchmark_database_operations, show_pool_information
+        
+        benchmark_database_operations()
+        show_pool_information()
+        
+        print("✅ Diagnóstico completado.")
+    except ImportError:
+        print("❌ Error: Módulo de diagnóstico no encontrado.")
+    except Exception as e:
+        print(f"❌ Error durante el diagnóstico: {e}")
+    
+    input("\nPresione Enter para continuar...")
+
+def mostrar_menu_schedule():
+    """Muestra el menú del sistema de schedule"""
+    print("\n" + "="*50)
+    print("      SISTEMA DE SCHEDULE - TAREAS AUTOMÁTICAS")
+    print("="*50)
+    print("1. Iniciar scheduler (ejecutar los domingos)")
+    print("2. Ejecutar tareas ahora (modo prueba)")
+    print("3. Ver próxima ejecución programada")
+    print("4. Volver al menú principal")
+    print("="*50)
+
+def menu_schedule():
+    """Maneja el menú del sistema de schedule"""
+    while True:
+        try:
+            limpiar_consola()
+            mostrar_menu_schedule()
+            
+            opcion = input("Seleccione una opción: ").strip()
+            
+            if opcion == "1":
+                limpiar_consola()
+                try:
+                    from scheduler import ejecutar_scheduler
+                    ejecutar_scheduler()
+                except ImportError:
+                    print("❌ Error: No se pudo importar el módulo scheduler.")
+                    print("Asegúrese de que la librería 'schedule' esté instalada.")
+                    input("\nPresione Enter para continuar...")
+                except Exception as e:
+                    print(f"❌ Error al ejecutar el scheduler: {e}")
+                    input("\nPresione Enter para continuar...")
+                    
+            elif opcion == "2":
+                limpiar_consola()
+                try:
+                    from scheduler import ejecutar_tareas_ahora
+                    ejecutar_tareas_ahora()
+                except ImportError:
+                    print("❌ Error: No se pudo importar el módulo scheduler.")
+                    input("\nPresione Enter para continuar...")
+                except Exception as e:
+                    print(f"❌ Error al ejecutar las tareas: {e}")
+                    input("\nPresione Enter para continuar...")
+                    
+            elif opcion == "3":
+                limpiar_consola()
+                try:
+                    from scheduler import mostrar_proximo_domingo
+                    mostrar_proximo_domingo()
+                except ImportError:
+                    print("❌ Error: No se pudo importar el módulo scheduler.")
+                except Exception as e:
+                    print(f"❌ Error: {e}")
+                input("\nPresione Enter para continuar...")
+                
+            elif opcion == "4":
+                return
+            else:
+                print("❌ Opción no válida. Intente de nuevo.")
+                input("\nPresione Enter para continuar...")
+                
+        except KeyboardInterrupt:
+            print("\n\nVolviendo al menú anterior...")
+            return
+        except Exception as e:
+            print(f"Error inesperado: {e}")
+            input("\nPresione Enter para continuar...")
+
 def main():
     """Función principal de la aplicación"""
     try:
@@ -218,6 +309,12 @@ def main():
                     limpiar_consola()
                     ejecutar_etl()
                 elif opcion == "4":
+                    limpiar_consola()
+                    ejecutar_diagnostico()
+                elif opcion == "5":
+                    limpiar_consola()
+                    menu_schedule()
+                elif opcion == "6":
                     print("👋 Saliendo del programa. ¡Hasta luego!")
                     break
                 else:
@@ -235,6 +332,13 @@ def main():
         print(f"❌ Error crítico durante la ejecución: {e}")
         print("El programa se cerrará.")
         input("\nPresione Enter para salir...")
+    finally:
+        # Limpiar conexiones al salir
+        try:
+            from db_utils import db_manager
+            db_manager.close_all_connections()
+        except:
+            pass
 
 if __name__ == "__main__":
     main()

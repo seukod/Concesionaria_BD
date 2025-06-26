@@ -17,7 +17,7 @@ user, password = iniciar_usuario()
 DB_CONFIG = {
     "host": "localhost",
     "port": 5432,
-    "database": "postgres",
+    "database": "db_transac",
     "user": user,
     "password": password
 }

@@ -1,5 +1,6 @@
 import psycopg2
 from config import DB_CONFIG
+from db_utils import execute_query
 
 def extract_modelos():
     conn = psycopg2.connect(**DB_CONFIG)

@@ -36,10 +36,10 @@ def leer_autos():
 def actualizar_auto():
     limpiar_consola()
     try:
-        id_auto = input("ID del auto a actualizar: ")
-        campo = input("Campo a actualizar (marca/modelo/anio): ")
+        patente = input("Patente(PK) del auto a actualizar: ")
+        campo = input("Campo a actualizar (patente/precio/auto_prueba/disponible/fecha_llegada/kilometraje/modelo): ")
         valor = input(f"Nuevo valor para {campo}: ")
-        update_row("autos", "id", id_auto, [campo], [valor])
+        update_row("autos", "patente", patente, [campo], [valor])
         print("Auto actualizado.")
     except Exception as e:
         print(f"Error al actualizar el auto: {e}")
@@ -48,8 +48,8 @@ def actualizar_auto():
 def eliminar_auto():
     limpiar_consola()
     try:
-        id_auto = input("ID del auto a eliminar: ")
-        delete_row("autos", "id", id_auto)
+        patente = input("Patente del auto a eliminar: ")
+        delete_row("autos", "patente", patente)
         print("Auto eliminado.")
     except Exception as e:
         print(f"Error al eliminar el auto: {e}")

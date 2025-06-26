@@ -1,6 +1,21 @@
 def run_etl():
     print("Iniciando proceso ETL...")
 
+    # Limpiar tablas de hechos antes de cargar
+    import psycopg2
+    from config import DB_CONFIG
+    try:
+        conn = psycopg2.connect(**DB_CONFIG)
+        cur = conn.cursor()
+        cur.execute("TRUNCATE TABLE analisis.hechos_ventas RESTART IDENTITY CASCADE;")
+        cur.execute("TRUNCATE TABLE analisis.\"Hechos_compras\" RESTART IDENTITY CASCADE;")
+        conn.commit()
+        cur.close()
+        conn.close()
+        print("Tablas de hechos truncadas correctamente.")
+    except Exception as e:
+        print("Error al truncar tablas de hechos:", e)
+
     from extract import (
         extract_modelos, extract_autos, extract_concesionarias, extract_usuarios,
         extract_region, extract_comunas, extract_ciudades,

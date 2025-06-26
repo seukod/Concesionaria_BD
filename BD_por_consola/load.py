@@ -111,11 +111,20 @@ def load_hechos_ventas(data):
     for row in data:
         query = """
             INSERT INTO analisis.hechos_ventas
-            (id_venta, id_concesionaria, id_comuna)
-            VALUES (%s, %s, %s)
+            (id_venta, id_concesionaria, id_usuario, id_auto, monto, fecha_venta, id_modelo, id_ciudad, id_region, id_comuna)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (id_venta) DO NOTHING
         """
         params = (
-            row["id_venta"], row["id_concesionaria"], row["id_comuna"]
+            row["id_venta"],
+            row["id_concesionaria"],
+            row["id_usuario"],
+            row["id_auto"],
+            row["monto"],
+            row["fecha_venta"],
+            row["id_modelo"],
+            row["id_ciudad"],
+            row["id_region"],
+            row["id_comuna"]
         )
         execute_query(query, params)

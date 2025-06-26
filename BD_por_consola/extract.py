@@ -189,9 +189,9 @@ def extract_hechos_ventas():
     cur.execute("""
         SELECT 
             v.id_venta, 
-            comp.concesionaria AS id_concesionaria,
-            comp.id_usuario,
-            comp.id_auto,
+            v.id_concesionaria,
+            v.id_usuario,
+            v.id_auto,
             v.monto,
             v.fecha_venta,
             a.modelo AS id_modelo,
@@ -199,9 +199,8 @@ def extract_hechos_ventas():
             r.id_region,
             ci.id_comuna
         FROM transaccional.ventas v
-        LEFT JOIN transaccional.compras comp ON v.id_venta = comp.id_compras
-        LEFT JOIN transaccional.autos a ON comp.id_auto = a.patente
-        LEFT JOIN transaccional.concesionarias c ON comp.concesionaria = c.id_concesionarias
+        LEFT JOIN transaccional.autos a ON v.id_auto = a.patente
+        LEFT JOIN transaccional.concesionarias c ON v.id_concesionaria = c.id_concesionarias
         LEFT JOIN transaccional.ciudad cd ON c.id_ciudad_concesionaria = cd.id_ciudad
         LEFT JOIN transaccional.comuna ci ON cd.id_comuna_perteneciente = ci.id_comuna
         LEFT JOIN transaccional.region r ON ci.id_region_perteneciente = r.id_region

@@ -13,7 +13,7 @@ import matplotlib.ticker as mtick
 def conectar():
     return psycopg2.connect(
         host="localhost",
-        password="5540",
+        password="minecraft",
         port="5432",
         database="postgres",
         user="postgres"
@@ -224,19 +224,37 @@ def modelo_mas_vendido_por_region(conn, anio):
         print("\nNo se encontraron resultados para ese año en modelo más vendido por región.")
         return []
 
-    # Ajustar nombres largos con saltos de línea
-    def wrap_label(label, width=15):
-        return "\n".join(textwrap.wrap(label, width))
+    # Ajustar nombres largos con saltos de línea y abreviaturas
+    def abreviar_region(nombre):
+        abreviaturas = {
+            'Región de Arica y Parinacota': 'Arica y Parinacota',
+            'Región de Tarapacá': 'Tarapacá',
+            'Región de Antofagasta': 'Antofagasta',
+            'Región de Atacama': 'Atacama',
+            'Región de Coquimbo': 'Coquimbo',
+            'Región de Valparaíso': 'Valparaíso',
+            'Región Metropolitana de Santiago': 'RM',
+            'Región del Libertador General Bernardo O’Higgins': 'O’Higgins',
+            'Región del Maule': 'Maule',
+            'Región de Ñuble': 'Ñuble',
+            'Región del Biobío': 'Biobío',
+            'Región de La Araucanía': 'Araucanía',
+            'Región de Los Ríos': 'Los Ríos',
+            'Región de Los Lagos': 'Los Lagos',
+            'Región de Aysén del Gral. Carlos Ibáñez del Campo': 'Aysén',
+            'Región de Magallanes y de la Antártica Chilena': 'Magallanes'
+        }
+        return abreviaturas.get(nombre, nombre)
 
-    regiones = [wrap_label(fila[0]) for fila in resultados]
+    regiones = [abreviar_region(fila[0]) for fila in resultados]
     modelos = [fila[1] for fila in resultados]
     cantidades = [fila[2] for fila in resultados]
     etiquetas = [f"{modelo} ({cant} ventas)" for modelo, cant in zip(modelos, cantidades)]
 
     # Gráfico
-    plt.figure(figsize=(12, 6))
+    plt.figure(figsize=(max(12, len(regiones)*0.9), 6))
     barras = plt.bar(regiones, cantidades, color='mediumseagreen')
-    plt.xticks(rotation=0, fontsize=9)
+    plt.xticks(rotation=30, fontsize=9, ha='right')
     plt.ylabel('Unidades vendidas')
     plt.title(f'Modelo más vendido por Región - {anio}')
 
@@ -249,8 +267,7 @@ def modelo_mas_vendido_por_region(conn, anio):
                  altura + 0.1,
                  etiqueta,
                  ha='center', va='bottom',
-                 fontsize=8, rotation=0,
-                 wrap=True)
+                 fontsize=8, rotation=0)
 
     plt.tight_layout()
     # Crear carpeta si no existe
@@ -294,22 +311,40 @@ def comparacion_compras_vs_ventas_por_region(conn, anio):
         resultados = cursor.fetchall()
 
     if resultados:
-        # Función para envolver texto largo
-        def wrap_label(label, width=15):
-            return "\n".join(textwrap.wrap(label, width))
+        # Abreviar nombres de regiones
+        def abreviar_region(nombre):
+            abreviaturas = {
+                'Región de Arica y Parinacota': 'Arica y Parinacota',
+                'Región de Tarapacá': 'Tarapacá',
+                'Región de Antofagasta': 'Antofagasta',
+                'Región de Atacama': 'Atacama',
+                'Región de Coquimbo': 'Coquimbo',
+                'Región de Valparaíso': 'Valparaíso',
+                'Región Metropolitana de Santiago': 'RM',
+                'Región del Libertador General Bernardo O’Higgins': 'O’Higgins',
+                'Región del Maule': 'Maule',
+                'Región de Ñuble': 'Ñuble',
+                'Región del Biobío': 'Biobío',
+                'Región de La Araucanía': 'Araucanía',
+                'Región de Los Ríos': 'Los Ríos',
+                'Región de Los Lagos': 'Los Lagos',
+                'Región de Aysén del Gral. Carlos Ibáñez del Campo': 'Aysén',
+                'Región de Magallanes y de la Antártica Chilena': 'Magallanes'
+            }
+            return abreviaturas.get(nombre, nombre)
 
-        regiones = [wrap_label(r[0]) for r in resultados]
+        regiones = [abreviar_region(r[0]) for r in resultados]
         vendidos = [r[1] for r in resultados]
         comprados = [r[2] for r in resultados]
 
         x = range(len(regiones))
         width = 0.35
 
-        plt.figure(figsize=(12, 6))
+        plt.figure(figsize=(max(12, len(regiones)*0.9), 6))
         plt.bar([i - width/2 for i in x], vendidos, width=width, label='Vendidos', color='steelblue')
         plt.bar([i + width/2 for i in x], comprados, width=width, label='Comprados', color='darkorange')
 
-        plt.xticks(x, regiones, rotation=0, fontsize=9)
+        plt.xticks(x, regiones, rotation=30, fontsize=9, ha='right')
         plt.title(f'Comparación de autos comprados vs vendidos por región - {anio}')
         plt.xlabel('Región')
         plt.ylabel('Cantidad')
@@ -345,7 +380,7 @@ def promedio_precio_venta_por_marca(conn, anio):
         cursor.execute(query, (anio,))
         resultados = cursor.fetchall()
 
-    # Mostrar resultados en consola con formato
+    # Mostrar resultados en consola with format
     for marca, promedio in resultados:
         print(f"{marca}: ${promedio:,.0f} CLP")
 

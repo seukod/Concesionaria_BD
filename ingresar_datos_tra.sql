@@ -302,7 +302,7 @@ DECLARE
     digitos TEXT;
     patente_auto TEXT;
     modelo_id INTEGER;
-    limite INTEGER := 100; -- <--- Cambia aquí la cantidad de autos de prueba
+    limite INTEGER := 2000; -- Ahora 2000 autos
 BEGIN
     WHILE i < limite LOOP
         -- Generar patente tipo AAAA01
@@ -342,10 +342,10 @@ DO $$
 DECLARE
     i INTEGER := 0;
     rut_generado INTEGER;
-    nombres TEXT[] := ARRAY['Juan', 'María', 'Pedro', 'Ana', 'Luis', 'Carla', 'José', 'Camila', 'Felipe', 'Sofía', 'Diego', 'Isabel', 'Jorge', 'Lucía', 'Andrés', 'Paula', 'Ricardo', 'Claudia', 'Tomás', 'Marta'];
-    apellidos TEXT[] := ARRAY['González', 'Rodríguez', 'Muñoz', 'Pérez', 'Soto', 'Rojas', 'Contreras', 'Silva', 'Martínez', 'Torres', 'Flores', 'López', 'Castillo', 'Vargas', 'Cruz', 'Molina', 'Fuentes', 'Vega', 'Orellana', 'Herrera'];
-    profesiones TEXT[] := ARRAY['Ingeniero', 'Profesor', 'Médico', 'Abogado', 'Arquitecto', 'Contador', 'Periodista', 'Enfermero', 'Diseñador', 'Técnico', 'Administrativo', 'Psicólogo', 'Electrónico', 'Veterinario', 'Químico'];
-    limite INTEGER := 50; -- <--- Cambia aquí la cantidad de usuarios de prueba
+    nombres TEXT[] := ARRAY['Juan', 'María', 'Pedro', 'Ana', 'Luis', 'Carla', 'José', 'Camila', 'Felipe', 'Sofía', 'Diego', 'Isabel', 'Jorge', 'Lucía', 'Andrés', 'Paula', 'Ricardo', 'Claudia', 'Tomás', 'Marta', 'Sebastián', 'Valentina', 'Francisco', 'Antonia', 'Matías', 'Fernanda', 'Cristóbal', 'Javiera', 'Vicente', 'Daniela', 'Benjamín', 'Josefa', 'Martina', 'Agustín', 'Emilia', 'Maximiliano', 'Trinidad', 'Gabriel', 'Florencia', 'Samuel', 'Amanda'];
+    apellidos TEXT[] := ARRAY['González', 'Rodríguez', 'Muñoz', 'Pérez', 'Soto', 'Rojas', 'Contreras', 'Silva', 'Martínez', 'Torres', 'Flores', 'López', 'Castillo', 'Vargas', 'Cruz', 'Molina', 'Fuentes', 'Vega', 'Orellana', 'Herrera', 'Reyes', 'Morales', 'Gutiérrez', 'Pizarro', 'Cáceres', 'Navarro', 'Salazar', 'Campos', 'Araya', 'Miranda', 'Valenzuela', 'Tapia', 'Ruiz', 'Saavedra', 'Carrasco', 'Bravo', 'Parra', 'Cortés', 'Gallardo', 'Acosta', 'Espinoza'];
+    profesiones TEXT[] := ARRAY['Ingeniero', 'Profesor', 'Médico', 'Abogado', 'Arquitecto', 'Contador', 'Periodista', 'Enfermero', 'Diseñador', 'Técnico', 'Administrativo', 'Psicólogo', 'Electrónico', 'Veterinario', 'Químico', 'Odontólogo', 'Kinesiólogo', 'Fonoaudiólogo', 'Nutricionista', 'Farmacéutico'];
+    limite INTEGER := 2000; -- Ahora 2000 usuarios
 BEGIN
     WHILE i < limite LOOP
         rut_generado := (random() * (25000000 - 1000000) + 1000000)::int;
@@ -379,7 +379,7 @@ DECLARE
     mes_offset INTEGER;
     dia_del_mes INTEGER;
     i INTEGER := 0;
-    limite INTEGER := 100; -- <--- Cambia aquí la cantidad de compras de prueba
+    limite INTEGER := 2000; -- Ahora 2000 compras
 BEGIN
     -- Recorremos todos los autos que aún no han sido comprados
     FOR auto IN
@@ -390,7 +390,7 @@ BEGIN
         )
         ORDER BY random()
     LOOP
-        -- Salir si se generan más de 18000 compras
+        -- Salir si se generan más de 2000 compras
         EXIT WHEN i >= limite;
 
         -- Elegir concesionaria aleatoria
@@ -436,7 +436,7 @@ DECLARE
     fecha_venta TIMESTAMP;
     mes_offset INTEGER;
     dia_del_mes INTEGER;
-    limite INTEGER := 100; -- <--- Cambia aquí la cantidad de ventas de prueba
+    limite INTEGER := 2000; -- Ahora 2000 ventas
 BEGIN
     -- Recorre autos que fueron comprados, evita autos repetidos
     FOR venta IN

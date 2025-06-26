@@ -12,18 +12,18 @@ import matplotlib.ticker as mtick
 
 def conectar():
     return psycopg2.connect(
-        host="aws-0-sa-east-1.pooler.supabase.com",
-        password="0NzSHHo6Ee9Hl4BI",
+        host="localhost",
+        password="minecraft",
         port="5432",
-        database="tabladehechos",
-        user="postgres.qdxsvygmfuqrrcaisqvw"
+        database="postgres",
+        user="postgres"
     )
 
 def ventas_por_mes(conn, anio):
     query = """
     SELECT TO_CHAR(hv.fecha_venta, 'YYYY-MM') AS anomes,
            COUNT(*) AS count
-    FROM "Hechos_ventas" hv 
+    FROM analisis.Hechos_ventas hv 
     WHERE TO_CHAR(hv.fecha_venta, 'YYYY') = %s
     GROUP BY TO_CHAR(hv.fecha_venta, 'YYYY-MM')
     ORDER BY anomes;
@@ -86,7 +86,7 @@ def compras_ventas_diferencia(conn, anio):
     (
         SELECT TO_CHAR(hc.fecha_compra, 'YYYY-MM') AS compraAnomes,
                SUM(hc.monto) AS monto_compras
-        FROM "Hechos_compras" hc
+        FROM analisis."Hechos_compras" hc
         WHERE TO_CHAR(hc.fecha_compra, 'YYYY') = %s
         GROUP BY compraAnomes
         ORDER BY compraAnomes
@@ -95,7 +95,7 @@ def compras_ventas_diferencia(conn, anio):
     (
         SELECT TO_CHAR(hv.fecha_venta, 'YYYY-MM') AS VentaAnomes,
                SUM(hv.monto) AS monto_ventas
-        FROM "Hechos_ventas" hv
+        FROM analisis.Hechos_ventas hv
         WHERE TO_CHAR(hv.fecha_venta, 'YYYY') = %s
         GROUP BY VentaAnomes
         ORDER BY VentaAnomes
@@ -138,7 +138,7 @@ def compras_ventas_diferencia(conn, anio):
     plt.legend()
     plt.grid(axis='y')
 
-    # Formatear el eje Y como CLP con separador de miles
+    # Formatear el eje Y como CLP with separador de miles
     formatter = mtick.FuncFormatter(lambda x, _: f"{int(x):,} CLP".replace(",", "."))
     plt.gca().yaxis.set_major_formatter(formatter)
 
@@ -157,8 +157,8 @@ def top_10_modelos_mas_vendidos(conn, anio):
     query = """
     SELECT m.nombre_modelo,
            COUNT(*) AS cantidad_vendida
-    FROM "Hechos_ventas" hv
-    JOIN modelos m ON hv.id_modelo = m.id_modelo
+    FROM analisis.Hechos_ventas hv
+    JOIN analisis.modelos m ON hv.id_modelo = m.id_modelo
     WHERE TO_CHAR(hv.fecha_venta, 'YYYY') = %s
     GROUP BY m.nombre_modelo
     ORDER BY cantidad_vendida DESC
@@ -208,17 +208,21 @@ def modelo_mas_vendido_por_region(conn, anio):
                m.nombre_modelo,
                COUNT(*) AS cantidad_vendida,
                ROW_NUMBER() OVER (PARTITION BY hv.id_region ORDER BY COUNT(*) DESC) AS fila
-        FROM "Hechos_ventas" hv
-        JOIN modelos m ON hv.id_modelo = m.id_modelo
+        FROM analisis.Hechos_ventas hv
+        JOIN analisis.modelos m ON hv.id_modelo = m.id_modelo
         WHERE TO_CHAR(hv.fecha_venta, 'YYYY') = %s
         GROUP BY hv.id_region, m.nombre_modelo
     ) ranked
-    JOIN region r ON ranked.id_region = r.id_region
+    JOIN analisis.region r ON ranked.id_region = r.id_region
     WHERE ranked.fila = 1;
     """
     with conn.cursor() as cursor:
         cursor.execute(query, (anio,))
         resultados = cursor.fetchall()
+
+    if not resultados:
+        print("\nNo se encontraron resultados para ese año en modelo más vendido por región.")
+        return []
 
     # Ajustar nombres largos con saltos de línea
     def wrap_label(label, width=15):
@@ -272,17 +276,17 @@ def comparacion_compras_vs_ventas_por_region(conn, anio):
            COALESCE(cc.comprados, 0) AS autos_comprados
     FROM (
         SELECT id_region, COUNT(*) AS vendidos
-        FROM "Hechos_ventas"
+        FROM analisis.Hechos_ventas
         WHERE TO_CHAR(fecha_venta, 'YYYY') = %s
         GROUP BY id_region
     ) vc
     FULL OUTER JOIN (
         SELECT id_region, COUNT(*) AS comprados
-        FROM "Hechos_compras"
+        FROM analisis."Hechos_compras"
         WHERE TO_CHAR(fecha_compra, 'YYYY') = %s
         GROUP BY id_region
     ) cc ON vc.id_region = cc.id_region
-    JOIN region r ON r.id_region = COALESCE(vc.id_region, cc.id_region)
+    JOIN analisis.region r ON r.id_region = COALESCE(vc.id_region, cc.id_region)
     ORDER BY r.id_region;
     """
     with conn.cursor() as cursor:
@@ -330,9 +334,9 @@ def promedio_precio_venta_por_marca(conn, anio):
     query = """
     SELECT m.marca,
            AVG(a.precio) AS promedio_precio_venta
-    FROM "Hechos_ventas" hv
-    JOIN autos a ON hv.id_auto = a.patente
-    JOIN modelos m ON hv.id_modelo = m.id_modelo
+    FROM analisis.Hechos_ventas hv
+    JOIN analisis.autos a ON hv.id_auto = a.patente
+    JOIN analisis.modelos m ON hv.id_modelo = m.id_modelo
     WHERE TO_CHAR(hv.fecha_venta, 'YYYY') = %s
     GROUP BY m.marca
     ORDER BY promedio_precio_venta DESC;

@@ -54,8 +54,8 @@ def menu_modificaciones():
     while True: 
         limpiar_consola()
         print("\n--- Menú de Modificaciones ---")
-        print("1. Modificar tabla Autos")
-        print("2. Modificar tabla de Ventas")
+        print("1. CRUD tabla Autos")
+        print("2. CRUD tabla de Ventas")
         print("3. Volver al menú principal")
         opcion = input("Seleccione una opción: ") 
         if opcion == "1":
@@ -94,7 +94,7 @@ def main():
     run_schema_scripts()
     while True:
         print("\n--- Menú Principal ---")
-        print("1. Modificaciones (compras/ventas)")
+        print("1. Actualizaciones (compras/ventas)")
         print("2. Rellenar base de datos transaccional")
         print("3. Ejecutar ETL")
         print("4. Salir")
